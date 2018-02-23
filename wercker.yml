@@ -20,6 +20,9 @@ build:
         name: go test
         code: |
           go test ./...
+    - script:
+        name: copy binary
+        code: cp pipeline "$WERCKER_OUTPUT_DIR"
 
 deploy:
   steps:
