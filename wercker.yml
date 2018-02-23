@@ -23,6 +23,9 @@ build:
 
 deploy:
   steps:
+    - script:
+        code: |
+          env
     - internal/docker-push:
         username: $USERNAME
         password: $PASSWORD
