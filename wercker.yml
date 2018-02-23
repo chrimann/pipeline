@@ -1,7 +1,5 @@
-box:
-  id: golang
-
 dev:
+  box: golang
   steps:
     - internal/watch:
         code: |
@@ -10,25 +8,27 @@ dev:
         reload: true
 
 build:
+  box: golang
   steps:
     - wercker/golint
-    - script:
-        name: go build
-        code: |
-          go build -o pipeline ./...
     - script:
         name: go test
         code: |
           go test ./...
     - script:
+        name: go build
+        code: |
+          CGO_ENABLED=0 go build -a -ldflags '-s' -installsuffix cgo -o app ./...
+    - script:
         name: copy binary
-        code: cp pipeline "$WERCKER_OUTPUT_DIR"
+        code: cp app "$WERCKER_OUTPUT_DIR"
 
 deploy:
+  box: golang
   steps:
-    - internal/docker-push:
+    - internal/docker-scratch-push:
         username: $USERNAME
         password: $PASSWORD
         tag: latest
-        cmd: ./pipeline
+        cmd: ./app
         repository: chrimann/pipeline
