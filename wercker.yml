@@ -27,5 +27,5 @@ deploy:
         username: $USERNAME
         password: $PASSWORD
         tag: latest
-        cmd: /pipeline/source/main.go
+        cmd: ./pipeline
         repository: chrimann/pipeline
