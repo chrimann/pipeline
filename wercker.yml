@@ -1,24 +1,45 @@
 dev:
   box: golang
   steps:
+    - wercker/setup-go-workspace:
+        package-dir: github.com/chrimann/pipeline
+    - script:
+        name: install go dep
+        code: |
+          curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+    - script:
+        name: install dependencies
+        code: |
+          dep ensure
     - internal/watch:
         code: |
-          go build ./...
-          ./source
+          CGO_ENABLED=0 go build -a -ldflags '-s' -installsuffix cgo -o app ./...
+          ./app
         reload: true
 
 build:
   box: golang
   steps:
-    - wercker/golint
+    - wercker/golint:
+        exclude: "vendor/"
+    - wercker/setup-go-workspace:
+        package-dir: github.com/chrimann/pipeline
     - script:
-        name: go test
+        name: install go dep
         code: |
-          go test ./...
+          curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+    - script:
+        name: install dependencies
+        code: |
+          dep ensure
     - script:
         name: go build
         code: |
           CGO_ENABLED=0 go build -a -ldflags '-s' -installsuffix cgo -o app ./...
+    - script:
+        name: go test
+        code: |
+          go test ./...
     - script:
         name: copy binary
         code: cp app "$WERCKER_OUTPUT_DIR"
